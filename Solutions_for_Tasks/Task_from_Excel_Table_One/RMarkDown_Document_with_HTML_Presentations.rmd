@@ -1,0 +1,72 @@
+---
+title: "Task1"
+author: "Egor Suslin"
+date: "09 09 2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+getwd()
+setwd("F:/folder")
+library(readxl)
+library(sqldf)
+my_data = read_excel("task1_data.xlsx")
+```
+
+## R Markdown for Task 1
+
+I decided to put all my answers for task1 into this html document created using Rmarkdown
+
+
+## First Question
+###1. Kolik se prodalo litrů (Volume in 1000 LTR) produktu FUZETEA-GR.TEA LIME&MINT 1.5L PB v CZ Supermarkets v roce 2014?
+```{r}
+V1_fuzz = sqldf('SELECT * from my_data WHERE ITEM = "FUZETEA-GR.TEA LIME&MINT 1.5L PB" AND MARKET = "CZ Hypermarkets"' )
+Answer1 = V1_fuzz[3,9]
+### ANSWER : 90.51300
+```
+Answer for the question number one is `r Answer1`
+
+## Second Question 
+### 2. Jaká byla průměrná cena produktu AQUILA-PRVNI VODA KOJENECKA 1.5L PB NS K v CZ Hypermarkets letech 2014, 2015, 2016?
+```{r}
+AVG_AQ = sqldf('SELECT * from my_data WHERE ITEM = "AQUILA-PRVNI VODA KOJENECKA 1.5L PB NS K" AND MARKET = "CZ Hypermarkets"' )
+Total = AVG_AQ[4,]
+Answer2_2014 = AVG_AQ[4,9]
+Answer2_2015 = AVG_AQ[4,10]
+Answer2_2016 = AVG_AQ[4,11]
+```
+Answer for the question number two:  
+|2014 | `r Answer2_2014`|  
+|2015 | `r Answer2_2015`|  
+|2016 | `r Answer2_2016`|  
+
+## Third Question
+### 3. Kolik se prodalo v CZK (Value in 1 000 000 CZK) produktu 7UP-1L PB na CZ Petrol Stations v roce 2015?
+
+```{r}
+CZK_7UP = sqldf('SELECT * FROM my_data WHERE ITEM = "7UP-1L PB" AND MARKET = "CZ Petrol Stations"')
+Answer3 = CZK_7UP[2,10]
+```
+Answer : `r Answer3`  
+I did not use Excel here, so I have only SQL formula. I hope it would be enough.  
+If not, I can also write you an Excel formula to do this tasks
+
+## Four Question
+### 4. Kolik se prodalo kusů (Units in 1000 PCS) 0.5L PET lahví ve WATER kategorii během roku 2014?
+
+```{r}
+names(my_data)[names(my_data) == 'PACKAGE TYPE'] <- 'PACKAGE_TYPE'
+PET_2014 = sqldf('SELECT * FROM my_data WHERE CATEGORY = "TOTAL WATER" AND PACKAGE_TYPE = "BOTTLE PET" AND SIZE = "0.5L" AND FACT = "Units (in 1000 PCS)"')
+Answer4 = sum(PET_2014[, "2014.0"]) ### In 1000 PCS
+```
+Answer : `r Answer4`  
+I did not use Excel here, so I have only SQL formula. I hope it would be enough.  
+If not, I can also write you an Excel formula to do this tasks
+
+## The End
+Thank you for this opportunity to join your wonderful company.  
+I can also to this tasks inside Excel file, but I think using R language looks a bit more professional for Data Scientists and Data Analyzing.  
+I wanted to show my skills and how I can solve many different problems in many different ways
+
