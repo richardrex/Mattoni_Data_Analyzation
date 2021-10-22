@@ -1,0 +1,59 @@
+---
+title: "Dashboard for Volume Mattoni 1873"
+output: 
+  flexdashboard::flex_dashboard
+runtime: shiny
+---
+
+```{r setup, include=FALSE}
+
+library(tidyverse)
+library(flexdashboard)
+library(DT)
+library(readxl)
+library(shiny)
+startData <- read_excel("Mattoni1873_Volume.xlsx")
+GBChoices <- as.list(names(startData[,c(1,3:5)]))
+names(GBChoices) <- paste(names(startData[,c(1,3:5)]),map(startData[,c(1,3:5)],~length(unique(.x))))
+
+updateData <- reactive(
+  startData %>% group_by(!!! rlang::syms(input$GB)) %>% summarise_if(is.numeric,sum,na.rm=T))
+```
+
+Column {.sidebar}
+------------------------------------------------------------------
+```{r}
+selectInput(inputId = "GB",label = "Group By",choices = GBChoices)
+selectInput(inputId = "Metric",label = "Metric",choices = names(select_if(startData,is.numeric)))
+```
+
+Column 
+------------------------------------------------------------------
+
+### Plot
+```{r}
+mynamestheme <- theme(plot.title = element_text(family = "Helvetica", face = "bold", size = (15)), 
+                 legend.title = element_text(colour = "darkblue",  face = "bold.italic", family = "Helvetica"), 
+                 legend.text = element_text(face = "italic", colour="steelblue",family = "Helvetica"), 
+                  axis.title = element_text(family = "Helvetica", size = (10), colour = "dodgerblue4"),
+                  axis.text = element_text(family = "Courier", colour = "cyan4", size = (10)))
+  
+renderPlot({
+ updateData() %>% 
+  ggplot(aes(x=!! rlang::sym(input$GB),y=!! rlang::sym(input$Metric),fill=!! rlang::sym(input$GB))) +
+  geom_col() + ggtitle("Plotting Volume of Mattoni 1873. Y(month in 2019) - Units in 1000 LTRS") + mynamestheme
+})
+```
+
+
+### Table 
+```{r}
+renderDT(
+  updateData(), rownames = F, extensions = 'Buttons', filter="top", editable=T,
+  options = list(
+    dom = 'Blfrtip',
+    buttons = c('copy', 'csv', 'excel', 'pdf', 'print'),
+      lengthMenu = list(c(10,50,100,-1),c(10,50,100,"All"))
+  )
+)
+```
